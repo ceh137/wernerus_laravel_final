@@ -1,0 +1,400 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: DejaVu Sans
+}
+
+.info-table {
+    width: 100%;
+    margin: 0;
+}
+
+body {
+    height: 29.7cm;
+    width: 20.7cm;
+    margin: 0;
+    padding: 5px;
+    /* change the margins as you want them to be. */
+    font-family: DejaVu Sans
+}
+
+/*body>table {*/
+/*    table-layout: fixed;*/
+/*}*/
+
+.content {
+    margin: 0 auto;
+    width: 95%;
+
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.up {
+    display: inline-block;
+    vertical-align: top;
+}
+
+
+.border {
+    border: 1px solid black;
+    padding: 2px;
+    max-width: max-content;
+}
+
+.bold {
+
+    /*font-weight: 800;*/
+}
+
+.track_num {
+    font-size: 40px;
+    margin-right: 10px;
+}
+
+
+.logo {
+
+    width: 40mm;
+}
+
+.logo-img {
+    width: 40mm;
+
+}
+
+
+.title {
+    font-size: 8px;
+}
+
+.table-header {
+    font-size: 10px;
+    margin: 0;
+    display: block;
+}
+
+.nob {
+    border-style: none;
+}
+.max {
+    min-width: 99%;
+}
+
+table {
+    font-size: 9px;
+    width: 100%;
+}
+
+table,
+tr,
+td {
+    padding: 2px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+    border-collapse: collapse;
+    max-width: 100%;
+}
+
+tr {
+    min-width: 5%;
+}
+
+.td-header {
+    font-size: 8px;
+    /*font-weight: 300;*/
+}
+
+.table-container>div{
+    width:45%;
+}
+.table-container>div>table{
+    width:100%;
+}
+.middle-table {
+    width: 100%;
+    margin-top: -30px;
+}
+.table-container {
+    width: 100%;
+    display: block;
+}
+
+.top-table {
+    margin-top: 30px;
+    display: block;
+}
+
+.table-info-text-container {
+    margin-right: 10px;
+    display: inline-block;
+}
+.inlineb {
+    display: inline-block;
+}
+.ml-50 {
+    margin-left: 70px;
+}
+
+.table-info-text {
+    /*height:auto;*/
+    /*border-style: solid;*/
+    /*border-width: 1px;*/
+    /*border-color: #000000;*/
+}
+.table-info-text > div {
+    max-width: 1000px;
+    min-width: 20px;
+}
+
+
+
+.cargo-info {
+    padding: 4px;
+    text-align: center;
+    font-size: 11px;
+}
+
+.tc {
+    text-align: center;
+}
+
+.check-container {
+    display: inline-block;
+    position: relative;
+    padding-left: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 9px;
+    width: max-content;
+    /*-webkit-user-select: none;*/
+    /*-moz-user-select: none;*/
+    /*-ms-user-select: none;*/
+    /*user-select: none;*/
+}
+
+/* Hide the browser's default checkbox */
+.check-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/*!* Create a custom checkbox *!*/
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    height: 12px;
+    width: 12px;
+    background-color: rgb(255, 255, 255);
+    border: 2px solid black;
+}
+
+/*!* On mouse-over, add a grey background color *!*/
+/*.check-container:hover input~.checkmark {*/
+/*    background-color: rgb(255, 255, 255);*/
+/*}*/
+
+/*!* When the checkbox is checked, add a blue background *!*/
+.check-container input:checked~.checkmark {
+    background-color: #ffffff;
+}
+
+/*!* Create the checkmark/indicator (hidden when not checked) *!*/
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/*!* Show the checkmark when checked *!*/
+.check-container input:checked~.checkmark:after {
+    display: inline-block;
+}
+
+/*!* Style the checkmark/indicator *!*/
+.check-container .checkmark:after {
+    left: 3px;
+    top: 0;
+    width: 4px;
+    height: 7px;
+    border: solid rgb(0, 0, 0);
+    border-width: 0 3px 3px 0;
+    /*-webkit-transform: rotate(45deg);*/
+    /*-ms-transform: rotate(45deg);*/
+    transform: rotate(45deg);
+}
+
+.add-table-header {
+    font-size: 9px;
+    /*font-weight: 400;*/
+}
+
+.notes-field {
+    height: 20px;
+    margin-bottom: 2px;
+    font-size: 10px;
+}
+
+.small-ol {
+    font-size: 6px;
+    /*font-weight: 300;*/
+    padding-left: 10px;
+    margin: 0;
+}
+
+.small {
+    font-size: 6px;
+    /*font-weight: 300;*/
+    line-height: 8px;
+}
+
+.margin {
+    margin: 4px;
+}
+
+
+.width {
+    width: 100%;
+}
+
+.my-5 {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.my-1 {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.mx-5 {
+    margin-right: 30px;
+    margin-left: 30px;
+}
+
+.predstavitel {
+    font-size: 12px;
+    /*font-weight: 300;*/
+    line-height: 12px;
+    width: 300px;
+
+}
+
+.client-sign {
+    font-size: 12px;
+    /*font-weight: 300;*/
+    line-height: 12px;
+}
+
+.sign {
+    width: 70px;
+    position: absolute;
+    top: -30px;
+    right: 20px;
+
+}
+
+.stamp {
+    width: 38mm;
+    height: 37mm;
+    position: absolute;
+    top: -80px;
+    right: -60px;
+
+}
+
+.cut-line {
+    border-top: 2px dashed black;
+    margin-top: 30px;
+}
+
+.cargo-info {
+    font-size: 12px;
+}
+
+.mr-5 {
+    margin-right: 20px;
+}
+
+.center {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.divider {
+    margin: 5px 0;
+}
+
+.footer {
+    height:60px;
+    width: 90%;
+    margin: 0 auto;
+
+}
+
+.w49 {
+    width: 49%;
+}
+
+.ml-10 {
+    margin-left: 70px;
+}
+
+.ml-5 {
+    margin-left: 10px;
+}
+
+.mr-10 {
+    margin-right: 10px;
+}
+
+/*.row {*/
+/*    display: table-row;*/
+/*    max-width: 100%*/
+/*}*/
+
+.cell {
+    max-width: 100%
+}
+
+.w70 {
+    width: 130px;
+}
+
+.w30 {
+    width: 80px;
+}
+
+.pr-5 {
+    padding-right: 4px;
+}
+
+.py {
+    padding: 7px 0;
+}
+.pl-5  {
+    padding-right: 10px;
+}
+
+.te {
+    text-align: right;
+}
+
+table.nopad {
+    padding: 0 ;
+}
+
+.text-footer {
+    font-size: 10px;
+}
