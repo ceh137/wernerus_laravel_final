@@ -13,6 +13,7 @@ use App\Models\Route;
 use App\Models\User;
 use App\Services\Calculator;
 use App\Services\FileService;
+use App\Services\SaveOrderToGoogleService;
 use App\Services\TelegramBot;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class IndexController extends Controller
         return view('index.about');
     }
 
+
     public function prices() {
         return view('index.prices');
     }
@@ -34,18 +36,21 @@ class IndexController extends Controller
         return view('index.docs');
     }
 
-    public function order() {
+    public function order(Request $request) {
+        if ($request->data) {
+            $data = $request->data;
+            return view('index.order_from_index', compact('data'));
+        }
         return view('index.order');
     }
 
     public function order_post(Request $request) {
 
-        try {
             $calc = new Calculator();
-            return $calc->save($request['data']);
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+            $order_id  = $calc->save($request['data']);
+            $service = new SaveOrderToGoogleService($order_id);
+            $service->send_application();
+            return $order_id;
 
     }
 
@@ -201,13 +206,12 @@ class IndexController extends Controller
     }
 
     public function order_repeat_save(Request $request) {
-        try {
             $calc = new Calculator();
             $order_id = $calc->save($request['data']);
-            return $order_id;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+            $service = new SaveOrderToGoogleService($order_id);
+           $service->send_application();
+        return $order_id;
+
     }
 
     public function excel_orders() {

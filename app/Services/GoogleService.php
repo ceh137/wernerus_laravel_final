@@ -12,16 +12,26 @@ class GoogleService
     private $client;
     private $googleSheetService;
     public bool $save;
+    public string $entity;
+    public bool $tracknum;
 
-    public function __construct($save = false)
+    public function __construct($save = false, $entity = 'order', $tracknum = false)
     {
         if ($save) {
-            $this->spreadSheetId = '1S4Ahbz_ABfAvfdioRykLoX3D38xZLHATh2b5s3-ygIo';
-        } else {
-            $this->spreadSheetId = '1Jkzr5gmkrEkPAzPsgXgQSRBi_pNEKbyiEa6zX1N7jJw';
-        }
+            if ($entity == 'order') {
+                $this->spreadSheetId = '1S4Ahbz_ABfAvfdioRykLoX3D38xZLHATh2b5s3-ygIo';
 
+            } elseif ($entity == 'application') {
+                $this->spreadSheetId = '1Jkzr5gmkrEkPAzPsgXgQSRBi_pNEKbyiEa6zX1N7jJw';
+
+            }
+        } else {
+            $this->spreadSheetId = '1S4Ahbz_ABfAvfdioRykLoX3D38xZLHATh2b5s3-ygIo';
+
+        }
+        $this->entity = $entity;
         $this->save = $save;
+        $this->tracknum = $tracknum;
         $this->client= new Google_Client();
         $this->client->setAuthConfig(storage_path('credentials.json'));
         $this->client->addScope('https://www.googleapis.com/auth/spreadsheets');
@@ -34,10 +44,24 @@ class GoogleService
         $dimensions = $this->getDimensions($this->spreadSheetId);
 
         if ($this->save) {
-            $range = 'sweb!A1:' . $dimensions['colCount'];
+            if ($this->entity == 'order') {
+                $range = "Лист1!A" . ($dimensions['colCount'] + 1);
+
+            } elseif ($this->entity == 'application') {
+                $range = "Лист1!A" . ($dimensions['colCount'] + 1);
+
+            }
+
         } else {
-            $range = 'Лист1!A1:' . $dimensions['colCount'];
+            if ($this->tracknum) {
+                $range = "Лист1!AW:AW";
+            } else {
+                $range = "Лист1!A" . ($dimensions['colCount'] + 1);
+            }
+
+
         }
+
 
 
         $data = $this->googleSheetService
@@ -59,7 +83,14 @@ class GoogleService
             'valueInputOption' => 'USER_ENTERED',
         ];
         if ($this->save) {
-            $range = "sweb!A" . ($dimensions['rowCount'] + 1);
+            if ($this->entity == 'order') {
+                $range = "Лист1!A" . ($dimensions['rowCount'] + 1);
+
+            } elseif ($this->entity == 'application') {
+                $range = "Лист1!A" . ($dimensions['rowCount'] + 1);
+
+            }
+
         } else {
             $range = "Лист1!A" . ($dimensions['rowCount'] + 1);
         }
@@ -73,10 +104,21 @@ class GoogleService
     private function getDimensions($spreadSheetId)
     {
         if ($this->save) {
-            $rowDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
-                $spreadSheetId,
-                ['ranges' => 'sweb!A:A', 'majorDimension' => 'COLUMNS']
-            );
+            if ($this->entity == 'order') {
+                $rowDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
+                    $spreadSheetId,
+                    ['ranges' => 'Лист1!A:A', 'majorDimension' => 'COLUMNS']
+                );
+
+
+            } elseif ($this->entity == 'application') {
+                $rowDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
+                    $spreadSheetId,
+                    ['ranges' => 'Лист1!A:A', 'majorDimension' => 'COLUMNS']
+                );
+
+            }
+
         } else {
             $rowDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
                 $spreadSheetId,
@@ -95,10 +137,19 @@ class GoogleService
             ];
         }
         if ($this->save) {
-            $colDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
-                $spreadSheetId,
-                ['ranges' => 'sweb!1:1', 'majorDimension' => 'ROWS']
-            );
+            if ($this->entity == 'order') {
+                $colDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
+                    $spreadSheetId,
+                    ['ranges' => 'Лист1!A:A', 'majorDimension' => 'ROWS']
+                );
+
+            } elseif ($this->entity == 'application') {
+                $colDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
+                    $spreadSheetId,
+                    ['ranges' => 'Лист1!A:A', 'majorDimension' => 'ROWS']
+                );
+
+            }
         } else {
             $colDimensions = $this->googleSheetService->spreadsheets_values->batchGet(
                 $spreadSheetId,

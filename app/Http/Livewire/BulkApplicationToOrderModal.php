@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Jobs\GenerateOrderFiles;
 use App\Mail\PasswordMade;
 use App\Models\AppToOrder;
 use App\Models\Customer;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use LivewireUI\Modal\ModalComponent;
 
@@ -95,7 +97,6 @@ class BulkApplicationToOrderModal extends ModalComponent
                 $who_pays = $this->order->who_pays->toArray();
 
                 $users = [];
-//            dd($who_pays);
                 foreach ($who_pays as  $user_id) {
                     $customer = Customer::find($user_id);
                     if (!$customer) {
@@ -105,11 +106,11 @@ class BulkApplicationToOrderModal extends ModalComponent
                         if ($customer->company_id == null && $customer->telnum != null && $customer->email != null) {
                             $pass = strtok($customer->email, '@').substr($customer->telnum, -4);
                         } elseif ($customer->company_id == null && $customer->telnum != null) {
-                            $pass = substr(str_slug($customer->name), 5).substr($customer->telnum, -4);
+                            $pass = substr(Str::slug($customer->name), 5).substr($customer->telnum, -4);
                         } elseif (!is_null($customer->company_id) && !is_null($customer->email)) {
                             $pass = strtok($customer->email, '@').substr($customer->company->INN, -4);
                         } else {
-                            $pass = str_random(8);
+                            $pass = Str::random(8);
                         }
                         $user = User::firstOrCreate(
                             [
@@ -134,12 +135,10 @@ class BulkApplicationToOrderModal extends ModalComponent
                 foreach ($unique->values()->all() as $user) {
 //                    Mail::to($user['email'])->send(new PasswordMade($user['pass'], $user, $this->order));
                 }
-                $files = new FileService($this->order->id);
-                $files->generateAll();
+                GenerateOrderFiles::dispatch($this->order);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
-                dd($e->getMessage());
             }
             $service  = new SaveOrderToGoogleService($order->id);
             $service->send();

@@ -17,6 +17,7 @@ use App\Http\Controllers\TelegramBotController;
 */
 
 Route::get('/', function () {
+    $order_id = 12312;
     return view('index.index');
 })->name('index');
 Route::get('/about', [IndexController::class, 'about'])->name('about');
@@ -24,6 +25,7 @@ Route::get('/prices', [IndexController::class, 'prices'])->name('prices');
 Route::get('/docs', [IndexController::class, 'docs'])->name('docs');
 Route::get('/order', [IndexController::class, 'order'])->name('order');
 Route::post('/order', [IndexController::class, 'order_post'])->name('order');
+//Route::get('/order', [IndexController::class, 'index_order'])->name('index_order');
 Route::post('/route_save', [IndexController::class, 'save_routes'])->name('save_routes');
 Route::post('/save_cities', [IndexController::class, 'save_cities'])->name('save_cities');
 Route::get('/email', [\App\Http\Controllers\Admin\EmailController::class, 'test'])->name('email');

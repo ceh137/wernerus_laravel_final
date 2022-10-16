@@ -77,10 +77,8 @@ final class ApplicationTable extends PowerGridComponent
 
         $this->showCheckBox();
 
-        return [
-            Exportable::make('export')
-                ->striped()
-                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
+
+        $array = [
 
             Header::make()
                 ->showSearchInput()
@@ -95,6 +93,14 @@ final class ApplicationTable extends PowerGridComponent
                 ->options()
                 ->showCollapseIcon(),
         ];
+
+        if (auth()->user()->email == "kondrashin@wernerus.ru") {
+            $array[] = Exportable::make('export')
+                ->striped()
+                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV);
+        }
+
+        return $array;
     }
 
 

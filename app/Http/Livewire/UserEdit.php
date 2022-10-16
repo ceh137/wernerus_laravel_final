@@ -20,6 +20,7 @@ class UserEdit extends ModalComponent
     public string $company_name;
     public string $what;
     public bool $with_nds;
+    public bool $gen_files;
     public $debt_time;
     public Collection $contacts_email;
     public Collection $contacts_telnum;
@@ -57,6 +58,7 @@ class UserEdit extends ModalComponent
             $this->debt_time = $this->user->debt_time ?? "5";
             $this->manager_id = $this->user->manager_id ?? 0;
             $this->with_nds = $this->user->with_nds ?? false;
+            $this->gen_files = $this->user->gen_files ?? true;
         }
 
 
@@ -94,6 +96,7 @@ class UserEdit extends ModalComponent
             $this->user->email = $this->email;
             $this->user->debt_time = $this->debt_time;
             $this->user->with_nds = $this->with_nds ?? false;
+            $this->user->gen_files = $this->gen_files ?? true;
         }
         $this->user->save();
 

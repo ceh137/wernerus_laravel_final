@@ -212,6 +212,7 @@
                         </ul>
                     </div>
                 @endif
+                @if(!is_null($order->files->nakladnaya))
                 <div class="col-span-3">
                 <div class="grid grid-cols-4 mx-5">
                     <div class="flex flex-col">
@@ -273,6 +274,7 @@
                     </div>
                 </div>
                 </div>
+             @endif
 
                 </div>
         </div>

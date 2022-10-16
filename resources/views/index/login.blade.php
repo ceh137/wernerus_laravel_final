@@ -12,6 +12,7 @@
                 </div>
             @endif
             <div class="uk-container">
+
                 <div class="uk-grid-margin uk-grid uk-grid-stack" uk-grid>
                     <div class="uk-width-1-1@m">
                         <div class="card">

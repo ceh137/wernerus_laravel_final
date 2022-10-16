@@ -53,10 +53,8 @@ final class DebtTable extends PowerGridComponent
     {
         $this->showCheckBox();
 
-        return [
-            Exportable::make('export')
-                ->striped()
-                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
+        $array =  [
+
             Header::make()
                 ->showToggleColumns(),
 
@@ -64,6 +62,14 @@ final class DebtTable extends PowerGridComponent
                 ->showPerPage()
                 ->showRecordCount(),
         ];
+
+        if (auth()->user()->email == "kondrashin@wernerus.ru") {
+            $array[] = Exportable::make('export')
+                ->striped()
+                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV);
+        }
+
+        return $array;
     }
 
     /*

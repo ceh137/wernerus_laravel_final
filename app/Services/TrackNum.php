@@ -2,13 +2,16 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Storage;
+
 class TrackNum
 {
     public string $alp = '0123456789AEXKMHPCT';
 
     public function getTrackNum($id) {
 
-        return $this->A00($id);
+        $lastnum = $this->getNumOfOrderNum($this->getLastOrderNumFromGoogle());
+        return $this->A00($lastnum+1);
     }
 
     public function txs($t) {
@@ -89,4 +92,29 @@ class TrackNum
         return substr($c, 0, 3) . '-' . substr($c, 3, 1) . substr($this->alp, $j, 1) . substr($c, 4);
     }
 
+
+    public function getNums() {
+        $nums = [];
+        for ($i = 0; $i < 25000; $i++) {
+            $nums[] = $this->getTrackNum($i);
+        }
+
+        Storage::put('tracknums.txt', json_encode($nums));
+    }
+
+    public function getLastOrderNumFromGoogle() {
+        $gs = new GoogleService(false, 'order', true);
+        $gogdata = $gs->readGoogleSheet();
+        $last = end($gogdata);
+        $last_num = $last[0];
+        return $last_num;
+    }
+
+    public function getNumOfOrderNum($last_num) {
+        $content = Storage::get('tracknums.txt');
+        $data = json_decode($content);
+        $number = array_search($last_num, $data);
+        return $number;
+
+    }
 }

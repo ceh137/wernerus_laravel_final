@@ -89,8 +89,13 @@ class FileService
     }
 
     public function generateAll() {
-
-        return $this->nakladnaya() && $this->PE() && $this->invoice() && $this->UPD();
+        $o = $this->order;
+        $not_gen_files = (!is_null($o->sender_company_id) && !$o->sender_comp->gen_files) || (!is_null($o->receiver_company_id) && !$o->receiver_comp->gen_files) || (!is_null($o->tp_company_id) && !$o->tp_comp->gen_files);
+        if ($not_gen_files) {
+            return true;
+        } else {
+            return $this->nakladnaya() && $this->PE() && $this->invoice() && $this->UPD();
+        }
     }
 
     public function getCompanyAddresses() {

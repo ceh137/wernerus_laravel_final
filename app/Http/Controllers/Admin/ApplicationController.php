@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\GenerateOrderFiles;
 use App\Mail\PasswordMade;
 use App\Models\AppToOrder;
 use App\Models\Customer;
@@ -264,8 +265,8 @@ class ApplicationController extends Controller
             foreach ($unique->values()->all() as $user) {
                 Mail::to($user['email'])->send(new PasswordMade($user['pass'], $user, $order));
             }
-            $files = new FileService($order->id);
-            $files->generateAll();
+
+            GenerateOrderFiles::dispatch($order);
 
             return $order->id;
         }

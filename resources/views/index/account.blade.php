@@ -277,6 +277,7 @@
                                         </div>
                                     </div>
                                 @if($order->status->name == 'Заказ')
+                                    @if(!is_null($order->files->nakladnaya))
                                 <div>
 {{--@dd(explode('/', $order->files->nakladnaya)[1], )--}}
                                     <div class="flex flex-col">
@@ -321,6 +322,7 @@
 
                                     </div>
                                 </div>
+                                    @endif
                                 @endif
                                 <div class="uk-margin-large-top">
                                     <a class="uk-link-text uk-text-bold uk-text" href="{{ route('order.repeat', ['id' => $order->id]) }}">ПОВТОРИТЬ ЗАКАЗ</a>
