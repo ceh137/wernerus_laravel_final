@@ -21,8 +21,12 @@ class DadataService
     {
 
         $dadata = DaDataCompany::id($this->company->INN, 1, null, BranchType::MAIN, CompanyType::LEGAL);
+        if (array_key_exists(0, $dadata['suggestions'])) {
+            return $dadata['suggestions'][0]['data']['address']['unrestricted_value'];
+        } else {
+            return '';
+        }
 
-        return $dadata['suggestions'][0]['data']['address']['unrestricted_value'];
     }
 
 }

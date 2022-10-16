@@ -831,6 +831,10 @@ export default {
         repeat: {
             default: false,
             type: Boolean
+        },
+        from_index: {
+            default: false,
+            type: Boolean
         }
     },
     data() {
@@ -1249,7 +1253,7 @@ export default {
             }
         },
         async ZoneAPI(terminal,address, where) {
-            let response = await fetch("http://wernerus.ru/zone.php?url="+ WernerZoneURL+this.EncodeString(terminal+String.fromCharCode(30)+address));
+            let response = await fetch("https://wernerus.ru/zone.php?url="+ WernerZoneURL+this.EncodeString(terminal+String.fromCharCode(30)+address));
             let data = await response.json();
             if (where == "from") {
                 this.zoneFrom = data;
@@ -2584,8 +2588,36 @@ export default {
 
     },
     created() {
-        console.log(this.order !== {}, this.order === {})
-        if (!this.order.hasOwnProperty('payments')) {
+        console.log(this.order !== {}, this.order === {}, this.from_index);
+        if (this.from_index) {
+
+            this.selected_from_city = this.order.selected_from_city;
+            this.selected_to_city = this.order.selected_to_city;
+            this.kg = this.order.kg;
+            this.meters = this.order.meters;
+            this.rig_pac = this.order.rig_pac;
+            this.stretch_pac = this.order.stretch_pac ;
+            this.bort_pac = this.order.bort_pac ;
+            this.insurance = this.order.insurance;
+            this.with_addr_from = this.order.with_addr_from;
+            this.with_addr_to = this.order.with_addr_to;
+            this.express = this.order.express;
+            this.econom = !this.order.express;
+            this.getDepTimeExpress();
+            this.getDepTimeEconom();
+            this.timer();
+            this.dateManage();
+            setInterval(this.timer, 1000 * 60);
+            this.payments;
+            this.payAllChosen;
+            this.sortCities();
+            this.calculator();
+            this.logInputKg();
+            this.logInputHeaviest();
+            this.logInputLongest();
+            this.logInputPieces();
+            this.logInputM();
+        } else if (!this.order.hasOwnProperty('payments')) {
             this.getDepTimeExpress();
             this.getDepTimeEconom();
             this.timer();

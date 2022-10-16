@@ -1,7 +1,6 @@
 <template>
     <div class="uk-grid-item-match uk-flex-middle uk-width-large@m">
         <div class="calc-widget">
-            <form action="/order" method="post">
                 <slot>
                     <!-- CSRF gets injected into this slot -->
                 </slot>
@@ -111,10 +110,9 @@
                                 <div id="arrExpress" class="uk-text">{{ arr_exp_text }}</div>
                                 <div id="total" class="uk-h1">ИТОГО: {{ total.toLocaleString('ru-Ru') }} руб.</div>
                             </div>
-                            <input class="uk-button uk-button-primary btn-order" type="submit" value="Оформить"> </div>
+                            <a class="uk-button uk-button-primary btn-order" v-on:click="submitForm" >Оформить</a> </div>
                     </div>
                 </div>
-            </form>
         </div>
     </div>
 </template>
@@ -269,18 +267,18 @@ export default {
     },
     methods: {
         submitForm() {
-            if (this.validatePrice()) {
+            if (true) {
                 let selFromCity = '';
                 let selToCity = '';
                 for (let city in this.to_cities) {
                     if (this.to_cities[city].code === this.selected_to_city) {
-                        selToCity = this.to_cities[city].name;
+                        selToCity = this.to_cities[city].code;
                         break;
                     }
                 }
                 for (let city in this.from_cities) {
                     if (this.from_cities[city].code === this.selected_from_city) {
-                        selFromCity = this.from_cities[city].name;
+                        selFromCity = this.from_cities[city].code;
                         break;
                     }
                 }
@@ -289,56 +287,26 @@ export default {
                 this.comment = this.comment.replace('%', ' ');
                 this.comment = this.comment.replace('$', ' ');
                 let dataToSubmit = {
-                    date_to: this.date_to,
-                    date_from: this.date_from,
-                    payments: this.payments,
-                    from_time_from_addr: this.from_time_from_addr,
-                    to_time_from_addr: this.to_time_from_addr,
-                    from_time_to_addr: this.from_time_to_addr,
-                    to_time_to_addr: this.to_time_to_addr,
                     selected_from_city: selFromCity,
                     selected_to_city: selToCity,
                     kg: this.kg,
                     meters: this.meters,
-                    pieces: this.pieces,
-                    heaviest: this.heaviest,
-                    longest: this.longest,
-                    to_fixed_time: this.to_fixed_time,
-                    from_fixed_time: this.from_fixed_time,
                     rig_pac: this.rig_pac,
                     stretch_pac: this.stretch_pac,
                     bort_pac: this.bort_pac,
                     insurance: this.insurance,
                     with_addr_from: this.with_addr_from,
                     with_addr_to: this.with_addr_to,
-                    PRR_to_addr: this.PRR_to_addr,
-                    PRR_from_addr: this.PRR_from_addr,
-                    TT_price: this.TT_price,
-                    to_addr_price: this.to_addr_price,
-                    from_addr_price: this.from_addr_price,
-                    rig_pac_price: this.rig_pac_price,
-                    stretch_pac_price: this.stretch_pac_price,
-                    bort_pac_price: this.bort_pac_price,
-                    insurance_price: this.insurance_price,
-                    worth: this.worth,
-                    PRR_to_addr_price: this.PRR_to_addr_price,
-                    PRR_from_addr_price: this.PRR_from_addr_price,
-                    total: this.total,
-                    express: this.express,
-                    addressFrom: this.addressFrom,
-                    addressTo: this.addressTo,
-                    cargo_type: this.cargo_type,
-                    comment: this.comment,
+                    express: this.express
                 };
                 console.log(dataToSubmit)
-                let url  =  "server.php?data="+JSON.stringify(dataToSubmit);
-                document.location.href = url;
+                document.location.href = "https://www.s230171.h1n.ru/order?data=" + JSON.stringify(dataToSubmit);
             } else {
                 this.warning = 'Наверное вы забыли выбрать что-то из оплаты';
             }
         },
         async ZoneAPI(terminal,address, where) {
-            let response = await fetch("http://wernerus.ru/zone.php?url="+ WernerZoneURL+this.EncodeString(terminal+String.fromCharCode(30)+address));
+            let response = await fetch("https://wernerus.ru/zone.php?url="+ WernerZoneURL+this.EncodeString(terminal+String.fromCharCode(30)+address));
             let data = await response.json();
             if (where == "from") {
                 this.zoneFrom = data;

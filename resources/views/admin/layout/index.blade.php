@@ -715,12 +715,10 @@
                 </ul>
             </div>
         </header>
-        <main  class="h-full overflow-y-auto">
-<div id="app">
-    @yield('content')
-</div>
-
-
+        <main  class="">
+            <div id="app">
+                @yield('content')
+            </div>
         </main>
     </div>
 </div>
