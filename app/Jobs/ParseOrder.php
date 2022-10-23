@@ -21,8 +21,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class ParseOrder implements ShouldQueue
 {
@@ -46,28 +48,32 @@ class ParseOrder implements ShouldQueue
     public function handle()
     {
         $data = $this->data;
-        DB::beginTransaction();
+
         try {
-            $from_c_id = City::where('name', $data[2])->first()->id;
-            $to_c_id = City::where('name', $data[3])->first()->id;
+                $from_c_id = City::where('name', $data[1])->first()->id;
+                $to_c_id = City::where('name', $data[2])->first()->id;
 
-            $route_id = Route::where(['to_city_id' => $to_c_id, 'from_city_id' => $from_c_id])->first()->id;
+                $route_id = Route::where(['to_city_id' => $to_c_id, 'from_city_id' => $from_c_id])->first();
 
-            $pac_price = 0;
-            $pac_price += $data[20] != '' && $data[20] != 0 ? intval($data[20]) : 0;
-            $pac_price +=  $data[21] != '' && $data[21] != 0 ? intval($data[21]) : 0;
-            $pac_price +=  $data[22] != '' && $data[22] != 0 ? intval($data[22]) : 0;
+                if (is_null($route_id))
+                {
+                    return;
+                } else {
+                    $route_id = $route_id->id;
+                }
 
             $prices = [
-                'TT_price' =>  $data[17] != '' && $data[17] != '0' ? intval($data[17]) : 0,
-                'to_addr_price' => $data[18] != '' && $data[18] != '0' ? intval($data[18]) : 0,
-                'from_addr_price' => $data[19] != '' && $data[19] != '0' ? intval($data[19]) : 0,
-                'pac_price' => (($data[20] != '' && $data[20] != '0') || ($data[21] != '' && $data[21] != '0') || ($data[22] != '' && $data[22] != '0')) ? $pac_price : 0,
-                'insurance_price' => $data[23] != '' && $data[23] != '0' ? intval($data[23]) : 0,
-                'prr_to_addr_price' =>  $data[25] != '' && $data[25] != '0' ? intval($data[25]) : 0,
-                'prr_from_addr_price' => $data[24] != '' && $data[24] != '0' ? intval($data[24]) : 0,
-                'total' =>  $data[47] ? intval($data[47]) : 0,
+                'TT_price' =>   intval($data[37])/100 ?: 0,
+                'to_addr_price' => intval($data[39])/100 ?: 0,
+                'from_addr_price' => intval($data[38])/100 ?: 0,
+                'pac_price' => intval($data[42])/100 ?: 0,
+                'insurance_price' => intval($data[43])/100 ?: 0,
+                'prr_to_addr_price' =>  intval($data[41])/100 ?: 0,
+                'prr_from_addr_price' => intval($data[40])/100 ?: 0,
+                'total' => 0,
             ];
+            $total = array_sum($prices) + intval($data[44])/100;
+            $prices['total'] = $total;
 
             $order_prices = new OrderPrice($prices);
             $order_prices->save();
@@ -82,42 +88,40 @@ class ParseOrder implements ShouldQueue
             }
 
             try {
-                $type = Type::where('name', '=', $data[52])->first()->id;
+                $type = Type::where('name', '=', $data[4])->first()->id;
             } catch (\Exception $e) {
                 $type = 11;
             }
 
             $sender =  Customer::create(
                 [
-                    'name' => $data[28],
-                    'email' => $data[30],
-                    'telnum' => $data[29],
+                    'name' => $data[27],
+                    'email' => $data[33],
+                    'telnum' => $data[30],
                 ]);
 
-            if ($data[27] != '') {
+            if ($data[21] != '0') {
                 $sender_comp = Company::updateOrCreate([
-                    'INN' => $data[27],
+                    'INN' => $data[21],
                 ],[
-                    'INN' => $data[27],
-                    'name' => $data[48],
+                    'INN' => $data[21],
+                    'name' => $data[24],
                 ]);
                 $sender->company_id = $sender_comp->id;
                 $sender->save();
             }
 
             $receiver = Customer::create([
-                'name' => $data[32],
+                'name' => $data[28],
                 'email' => $data[34],
-                'telnum' => $data[33],
-                'is_phys' => $data[31] == '',
-                'role_id' => 1
+                'telnum' => $data[31],
             ]);
-            if ($data[31] != '') {
+            if ($data[22] != '0') {
                 $receiver_comp = Company::updateOrCreate([
-                    'INN' => $data[31],
+                    'INN' => $data[22],
                 ],[
-                    'INN' => $data[31],
-                    'name' => $data[49],
+                    'INN' => $data[22],
+                    'name' => $data[25],
                 ]);
                 $receiver->company_id = $receiver_comp->id;
                 $receiver->save();
@@ -126,16 +130,16 @@ class ParseOrder implements ShouldQueue
 
             if ($data[36]) {
                 $third_party = Customer::create([
-                    'name' => $data[36],
-                    'email' => $data[38],
-                    'telnum' => $data[37],
+                    'name' => $data[29],
+                    'email' => $data[35],
+                    'telnum' => $data[32],
                 ]);
-                if ($data[35] != '') {
+                if ($data[23] != '0') {
                     $third_party_comp = Company::updateOrCreate([
-                        'INN' => $data[35],
+                        'INN' => $data[23],
                     ],[
-                        'INN' => $data[35],
-                        'name' => $data[50],
+                        'INN' => $data[23],
+                        'name' => $data[26],
                     ]);
                     $third_party->company_id = $third_party_comp->id;
                     $third_party->save();
@@ -146,47 +150,69 @@ class ParseOrder implements ShouldQueue
             $files = new File();
             $files->save();
             $res = [];
-
-            $p = [
-                39 => 'pay_all',
-                40 => 'pay_TT',
-                41 =>  'pay_del_to_addr',
-                42 => 'pay_del_from_addr',
-                43 => 'pay_pac',
-                44 => 'pay_ins',
-                45 => 'pay_PRR_from_addr',
-                46 => 'pay_PRR_to_addr',
-            ];
-
-            foreach ($p as $k=>$v) {
-                if ($data[$k] == 'Отправитель') {
-                    $res[$v] = $sender->id;
-                } elseif ($data[$k] == 'Получатель') {
-                    $res[$v] = $receiver->id;
-                } elseif ($data[$k] == '3e-лицо') {
-                    $res[$v] = $third_party->id;
-                } else {
-                    $res[$v] = null;
+            $matrix = str_split($data[45]);
+            if (count(array_flip($matrix)) === 1 && (end($matrix) === 'A' || end($matrix) === 'S' || end($matrix) === 'T')) {
+                if (end($matrix) === 'A') {
+                    $res['pay_all'] = $receiver->id;
+                } elseif (end($matrix) === 'S') {
+                    $res['pay_all'] = $sender->id;
+                } elseif (end($matrix) === 'T') {
+                    $res['pay_all'] = $third_party->id;
+                }else {
+                    $res['pay_all'] = null;
                 }
+
             }
+//            $p = [
+//                39 => 'pay_all',
+//                40 => 'pay_TT',
+//                41 => 'pay_del_to_addr',
+//                42 => 'pay_del_from_addr',
+//                43 => 'pay_pac',
+//                44 => 'pay_ins',
+//                45 => 'pay_PRR_from_addr',
+//                46 => 'pay_PRR_to_addr',
+//            ];
+//
+//            foreach ($p as $k=>$v) {
+//                if ($data[$k] == 'Отправитель') {
+//                    $res[$v] = $sender->id;
+//                } elseif ($data[$k] == 'Получатель') {
+//                    $res[$v] = $receiver->id;
+//                } elseif ($data[$k] == '3e-лицо') {
+//                    $res[$v] = $third_party->id;
+//                } else {
+//                    $res[$v] = null;
+//                }
+//            }
 
             $payments = [
-                "TT" => $res['pay_TT'],
-                'to_addr' => $res['pay_del_to_addr'],
-                'from_addr' => $res['pay_del_from_addr'],
-                'package' => $res['pay_pac'],
-                'insurance' => $res['pay_ins'],
-                'prr_to_addr' => $res['pay_PRR_to_addr'],
-                'prr_from_addr' => $res['pay_PRR_from_addr'],
+                "TT" => null,
+                'to_addr' => null,
+                'from_addr' => null,
+                'package' => null,
+                'insurance' => null,
+                'prr_to_addr' => null,
+                'prr_from_addr' => null,
                 'total' => $res['pay_all']
             ];
 
             $who_pays = new WhoPays($payments);
             $who_pays->save();
 
-            if ($data[1] == 'ЭКОНОМ') {
+            if ($data[46] == 'TRUE') {
+                    $u = Customer::find($res['pay_all']);
+                    $c = Company::find($u->company->id);
+
+                    $c->with_nds = true;
+                    $c->save();
+
+
+            }
+
+            if ($data[3] == '0') {
                 $method = 2;
-            } elseif ($data[1] == 'ЭКСПРЕСС') {
+            } elseif ($data[3] == '1') {
                 $method =  1 ;
             }
 
@@ -194,64 +220,55 @@ class ParseOrder implements ShouldQueue
                 'method_id' => $method,
                 'route_id' => $route_id,
                 'delivery_type' => $delivery_type,
-                'del_from_addr_time_from' => $data[8],
-                'del_from_addr_time_to' => $data[9],
-                'del_to_addr_time_from' => $data[10],
-                'del_to_addr_time_to' => $data[11],
-                'date_del_to_addr' => $data[7],
-                'date_del_from_addr' => $data[6],
-                'weight' => toFloat($data[12]),
-                'volume' => toFloat($data[13]),
-                'pieces' => toFloat($data[14]),
-                'heaviest' => toFloat($data[15]),
-                'longest' => toFloat($data[16]),
-                'worth' => toFloat($data[26]),
+                'del_from_addr_time_from' => Carbon::createFromTimestamp($data[7] * 24 * 60 * 60 + $data[9] * 60)->format('H:i'),
+                'del_from_addr_time_to' => '0',
+                'del_to_addr_time_from' => Carbon::createFromTimestamp($data[8] * 24 * 60 * 60 + $data[10] * 60)->format('H:i'),
+                'del_to_addr_time_to' => '0',
+                'date_del_to_addr' => Carbon::createFromTimestamp($data[8] * 24 * 60 * 60)->toDateTimeString(),
+                'date_del_from_addr' => Carbon::createFromTimestamp($data[7] * 24 * 60 * 60)->toDateTimeString(),
+                'weight' => toFloat($data[11]),
+                'volume' => toFloat($data[12]),
+                'pieces' => toFloat($data[13]),
+                'heaviest' => toFloat($data[14]),
+                'longest' => toFloat($data[15]),
+                'worth' => toFloat($data[20]),
                 'to_addr' => $data[18] != '',
                 'from_addr' => $data[19] != '',
-                'rig_pac' => $data[20] != '',
-                'stretch_pac' => $data[21] != '',
-                'bort_pac' => $data[22] != '',
-                'insurance' => $data[23] != '',
-                'prr_to_addr' => $data[25] != '',
-                'prr_from_addr' => $data[24] != '',
+                'rig_pac' => $data[16] == '1',
+                'stretch_pac' => $data[16] == '2',
+                'bort_pac' => $data[16] == '3',
+                'insurance' => $data[19] != 'FALSE',
+                'prr_to_addr' => $data[17] != 'FALSE',
+                'prr_from_addr' => $data[18] != 'FALSE',
                 'type_id' => $type,
                 'sender_id' => $sender->id,
                 'receiver_id' => $receiver->id,
                 'tp_id' => $third_party->id ?? null,
-                'sender_company_id' => $sender_comp->id,
-                'receiver_company_id' => $receiver_comp->id,
+                'sender_company_id' => $sender_comp->id ?? null,
+                'receiver_company_id' => $receiver_comp->id ?? null,
                 'tp_company_id' => $third_party_comp->id ?? null,
                 'order_price_id' => $order_prices->id,
                 'who_pays_id' => $who_pays->id,
-                'comment' => $data[51],
+                'comment' => $data[47],
                 'filled_at_terminal' => false,
-                'status_id' => 1,
+                'status_id' => 2,
                 'files_id' => $files->id,
-                'address_to' => $data[5],
-                'address_from'=> $data[4],
-                'created_at'  => $data[0],
-                'updated_at' => $data[0]
+                'address_to' => $data[6],
+                'address_from'=> $data[5],
+                'created_at'  => Carbon::createFromTimestamp($data[0]/1000)->toDateTimeString(),
+                'updated_at' => Carbon::createFromTimestamp($data[0]/1000)->toDateTimeString()
             ];
 
             $norder = new Order($order);
             $norder->save();
-            DB::commit();
-//                return $norder->id;
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $e->getMessage();
-        }
-
-        try {
-            DB::beginTransaction();
             $app_to_order = new AppToOrder();
             $app_to_order->order_id = $norder->id;
             $app_to_order->save();
             $app_to_order->order_num = $data[48];
             $app_to_order->save();
             $norder->status_id = 2;
-            $norder->time_to_order = now('Europe/Moscow');
+            $norder->time_to_order = Carbon::createFromTimestamp($data[0]/1000)->toDateTimeString();
             $norder->order_num = $app_to_order->order_num;
             $norder->save();
             $debt = new Debt();
@@ -287,14 +304,14 @@ class ParseOrder implements ShouldQueue
 
 
             $debt->paid = json_encode($debt_paid);
-            $debt->transfer_nums = '--';
-            $debt->transfer_date = null;
+            $debt->transfer_nums = $data[52] ?: "--";
+            $debt->transfer_date = $data[51] ?: null;
             $debt->save();
 
             $who_pays = $norder->who_pays->toArray();
 
             $users = [];
-//            dd($who_pays);
+
             foreach ($who_pays as  $user_id) {
                 $customer = Customer::find($user_id);
                 if (!$customer) {
@@ -304,11 +321,11 @@ class ParseOrder implements ShouldQueue
                     if ($customer->company_id == null && $customer->telnum != null && $customer->email != null) {
                         $pass = strtok($customer->email, '@').substr($customer->telnum, -4);
                     } elseif ($customer->company_id == null && $customer->telnum != null) {
-                        $pass = substr(str_slug($customer->name), 5).substr($customer->telnum, -4);
+                        $pass = substr(Str::slug($customer->name), 5).substr($customer->telnum, -4);
                     } elseif (!is_null($customer->company_id) && !is_null($customer->email)) {
                         $pass = strtok($customer->email, '@').substr($customer->company->INN, -4);
                     } else {
-                        $pass = str_random(8);
+                        $pass = Str::random(8);
                     }
                     $user = User::firstOrCreate(
                         [
@@ -333,12 +350,11 @@ class ParseOrder implements ShouldQueue
             foreach ($unique->values()->all() as $user) {
 //                    Mail::to($user['email'])->send(new PasswordMade($user['pass'], $user, $norder));
             }
-            $files = new FileService($norder->id);
-//            $files->generateAll();
-            DB::commit();
+
+
         } catch (\Exception $e) {
-            DB::rollBack();
-            dd($e->getMessage());
+
+            dd($e->getMessage(), $e->getLine());
         }
     }
 }

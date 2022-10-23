@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\IndexController;
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Jobs\ParseOrder;
+use App\Services\GoogleService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TelegramBotController;
 
@@ -17,7 +19,19 @@ use App\Http\Controllers\TelegramBotController;
 */
 
 Route::get('/', function () {
-    $order_id = 12312;
+//    $gog = new GoogleService();
+//    $data_full =  $gog->readGoogleSheet();
+//    foreach ($data_full as $data) {
+//        if ($data === $data_full[0]) {
+//            continue;
+//        } elseif ($data[2] == '') {
+//            continue;
+//        }
+//        $orderr = new ParseOrder($data);
+//        $orderr->handle();
+//
+//
+//    }
     return view('index.index');
 })->name('index');
 Route::get('/about', [IndexController::class, 'about'])->name('about');

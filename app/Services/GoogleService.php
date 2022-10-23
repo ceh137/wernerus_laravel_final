@@ -56,7 +56,7 @@ class GoogleService
             if ($this->tracknum) {
                 $range = "Лист1!AW:AW";
             } else {
-                $range = "Лист1!A" . ($dimensions['colCount'] + 1);
+                $range = "Лист1!A" .':'. ($dimensions['colCount']);
             }
 
 
